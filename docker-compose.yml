@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  database:
+    build:
+      context: ./database
+      dockerfile: Dockerfile
+    container_name: database
+    restart: always
+    ports:
+      - 3307:3306
+    expose:
+      - 3308
+    volumes:
+      - './.mysql-data/db:/var/lib/mysql'
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: backend
+    restart:  always
+    ports:
+      - 4000:8000
+    volumes:
+      - './backend/:/opt/backend/'
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file:
+      - ./env/django.env
+    depends_on:
+      - database
