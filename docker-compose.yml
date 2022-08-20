@@ -13,6 +13,8 @@ services:
       - 3308
     volumes:
       - './.mysql-data/db:/var/lib/mysql'
+    networks:
+      - bridge_network
   backend:
     build:
       context: ./backend
@@ -28,3 +30,27 @@ services:
       - ./env/django.env
     depends_on:
       - database
+    networks:
+      - bridge_network
+  frontend:
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    restart: always
+    ports:
+      - 3001:3000
+    expose:
+      - 3000
+    volumes:
+      - './frontend/:/opt/frontend/'
+    command: yarn start
+    depends_on:
+      - backend
+    networks:
+      - bridge_network
+
+networks:
+  bridge_network:
+    driver: bridge
+    
