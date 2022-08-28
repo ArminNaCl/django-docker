@@ -49,6 +49,30 @@ services:
       - backend
     networks:
       - bridge_network
+  redis:
+    build: 
+      context: ./redis
+      dockerfile: Dockerfile
+    ports:
+      - 6380:6379
+    expose:
+      - 6379
+    networks:
+      - bridge_network
+  celery:
+    restart: always
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    command: celery -A app worker -l info
+    volumes:
+      - ./backend/:/opt/backend
+    depends_on:
+      - database
+      - redis
+      - backend
+    networks:
+      - bridge_network
 
 networks:
   bridge_network:
